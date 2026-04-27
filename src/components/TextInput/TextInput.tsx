@@ -14,3 +14,16 @@ function TextInput({ onTextChange, placeholder = "Start typing...", initialValue
         resize: "vertical" as const,
         outline: "none",
     };
+
+    return (
+        <textarea
+            style={style}
+            placeholder={placeholder}
+            defaultValue={initialValue}
+            onChange={(e) => onTextChange(e.target.value)}
+            rows={6}
+        />
+    );
+}
+
+export default TextInput;
