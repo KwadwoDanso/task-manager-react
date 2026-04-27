@@ -29,3 +29,29 @@ function StatsDisplay({ stats, showReadingTime = true }: StatsDisplayProps) {
         fontWeight: 700,
         color: "#111827",
     };
+    return (
+        <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", marginTop: "1rem" }}>
+            <div style={cardStyle}>
+                <div style={labelStyle}>Characters</div>
+                <div style={valueStyle}>{stats.characterCount}</div>
+            </div>
+
+            <div style={cardStyle}>
+                <div style={labelStyle}>Words</div>
+                <div style={valueStyle}>{stats.wordCount}</div>
+            </div>
+
+            {/* Only show reading time card if showReadingTime is true */}
+            {showReadingTime && (
+                <div style={cardStyle}>
+                    <div style={labelStyle}>Reading Time</div>
+                    <div style={valueStyle}>
+                        {stats.readingTime < 1 ? "< 1" : stats.readingTime} min
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}
+
+export default StatsDisplay;
