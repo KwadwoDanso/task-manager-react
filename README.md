@@ -1,73 +1,83 @@
-# React + TypeScript + Vite
+# Task Manager Lab 3
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React + TypeScript task management app that lets users create tasks, filter by status and priority, update task status, and delete tasks.
 
-Currently, two official plugins are available:
+## Table of contents
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- [Overview](#overview)
+  - [Links](#links)
+- [My process](#my-process)
+  - [Built with](#built-with)
+  - [What I learned](#what-i-learned)
+- [Reflections](#reflections)
+- [Author](#author)
+- [Acknowledgments](#acknowledgments)
 
-## React Compiler
+## Overview
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Add new tasks with a title, description, priority level, and due date.
+- Change a task's status using a dropdown (pending, in-progress, completed).
+- Delete tasks with a confirmation prompt.
+- Filter tasks by status and priority using dropdown menus.
+- Visual indicators: left border color for priority, background tint for status.
+- Completed tasks render with a strikethrough and reduced opacity.
+- Empty state message when no tasks exist or no tasks match the current filter.
 
-## Expanding the ESLint configuration
+### Links
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Solution URL: ([https://github.com/KwadwoDanso/task-manager-react.git])
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## My process
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- Defined all TypeScript interfaces in types/index.ts first so every component had a clear contract before writing any JSX.
+- Built TaskItem first since it's the leaf component with no children. It receives a single task and renders the card with the status dropdown and delete button.
+- Built TaskFilter next with two dropdowns for status and priority. It uses local state to track dropdown values and fires onFilterChange to tell the parent what's selected.
+- Built TaskList as the wrapper that maps through the tasks array and renders one TaskItem per task using task.id as the unique key. It also handles the empty state.
+- Built App.tsx last to manage the master task array, the filter state, and the add-task form. The app starts empty so the user creates their own tasks.
+- Tested by uncommenting console.log calls at key points during development. All testing logs are commented out in the final code.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+### Built with
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+- React 18
+- TypeScript
+- Vite (build tool)
+- React useState hook for state management
+- Inline styles with camelCase JavaScript objects
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### What I learned
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- How to render lists with .map() and why each item needs a unique key prop so React can track which items changed.
+- How to lift state up to the parent component. The task array lives in App.tsx and child components communicate changes through callback props.
+- How TypeScript union types like TaskStatus = "pending" | "in-progress" | "completed" catch invalid values at compile time.
+- How conditional rendering with && and ternary operators lets components show different UI based on task properties like status and priority.
+- How to type event handlers with React.ChangeEvent<HTMLSelectElement> and React.ChangeEvent<HTMLInputElement>.
+
+## Reflections
+
+- How did you ensure unique keys for your list items?
+    - Each task gets a unique id generated by Date.now().toString() when it's created. This id is used as the key prop in the .map() call inside TaskList. Since Date.now() returns milliseconds, each task gets a distinct key.
+
+- What considerations did you make when implementing the filtering functionality?
+    - The filter state uses optional properties (status?: TaskStatus). When a filter is undefined it means "show all" for that category. The filtered array is built by checking each task against only the active filters. Clearing both filters shows all tasks again.
+
+- How did you handle state updates for task status changes?
+    - The handleStatusChange function in App uses .map() to create a new array where only the matching task has its status replaced using the spread operator ({ ...t, status: newStatus }). This creates a new array reference so React knows to re-render.
+
+- What challenges did you face when implementing conditional rendering?
+    - The trickiest part was the visual feedback. Each task needed a different border color based on priority AND a different background based on status. I solved this with two lookup objects (priorityColors and statusColors) that map each value to its color, then used bracket notation to pick the right one.
+
+- Challenge; General
+    - One of the biggest hurdles was getting through git and github. Folders were automatically being deleted and I accidentally had this project in another repo. SO, I had to spend a lot of time resolving git issues in tandem with loading the project. A lot of learns along the way. 
+
+## Author
+
+Kwadwo Danso
+
+## Acknowledgments
+
+- React Documentation — Rendering Lists (https://react.dev/learn/rendering-lists)
+- React Documentation — Conditional Rendering (https://react.dev/learn/conditional-rendering)
+- TypeScript Handbook — Union Types (https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#union-types)
+- Per Scholas course materials on React components, props, state, and events.
+- Vite documentation for project scaffolding (https://vite.dev/guide/)
+- Use of AI for visual feedback, implementing filtering functionality and things like creating task management interface
