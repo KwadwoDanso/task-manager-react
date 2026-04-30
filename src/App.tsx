@@ -66,3 +66,38 @@ function App() {
     if (filters.priority && task.priority !== filters.priority) return false;
     return true;
   });
+  inputStyle, flex: 1
+}}
+            />
+          </div >
+  <button
+    onClick={handleAddTask}
+    style={{
+      padding: "0.5rem 1.25rem",
+      backgroundColor: "#10b981",
+      color: "#fff",
+      border: "none",
+      borderRadius: "6px",
+      cursor: "pointer",
+      fontSize: "0.9rem",
+    }}
+  >
+    Save Task
+  </button>
+        </div >
+      )}
+
+{/* Filter controls */ }
+<TaskFilter onFilterChange={handleFilterChange} />
+
+{/* The task list — receives the FILTERED array */ }
+<TaskList
+  tasks={filteredTasks}
+  onStatusChange={handleStatusChange}
+  onDelete={handleDelete}
+/>
+    </div >
+  );
+}
+
+export default App;
