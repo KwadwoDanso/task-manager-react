@@ -1,122 +1,68 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+// App.tsx — manages the task array, filter state, add-task form, and handlers
+
+import { useState } from "react";
+import TaskList from "./components/TaskList/TaskList";
+import TaskFilter from "./components/TaskFilter/TaskFilter";
+import { Task, TaskStatus, TaskPriority, TaskFilters } from "./types";
 
 function App() {
-  const [count, setCount] = useState(0)
+  // Starts empty — user creates their own tasks
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [filters, setFilters] = useState<TaskFilters>({});
 
-  return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+  // Controls whether the add-task form is visible
+  const [showForm, setShowForm] = useState(false);
 
-      <div className="ticks"></div>
+  // Form input state
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [priority, setPriority] = useState<TaskPriority>("medium");
+  const [dueDate, setDueDate] = useState("");
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+  // Add a new task from the form inputs
+  const handleAddTask = () => {
+    if (!title.trim() || !dueDate) return;
+    // console.log("App: adding task - " + title);
+    const newTask: Task = {
+      id: Date.now().toString(),
+      title: title.trim(),
+      description: description.trim(),
+      status: "pending",
+      priority: priority,
+      dueDate: dueDate,
+    };
+    setTasks([...tasks, newTask]);
+    // Reset form
+    setTitle("");
+    setDescription("");
+    setPriority("medium");
+    setDueDate("");
+    setShowForm(false);
+  };
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
-}
+  // Update a task's status by id
+  const handleStatusChange = (taskId: string, newStatus: TaskStatus) => {
+    // console.log("App: changing status for " + taskId + " to " + newStatus);
+    setTasks(tasks.map((t) =>
+      t.id === taskId ? { ...t, status: newStatus } : t
+    ));
+  };
 
-export default App
+  // Remove a task from the list
+  const handleDelete = (taskId: string) => {
+    // console.log("App: deleting " + taskId);
+    setTasks(tasks.filter((t) => t.id !== taskId));
+  };
+
+  // TaskFilter calls this when its dropdowns change
+  const handleFilterChange = (newFilters: TaskFilters) => {
+    // console.log("App: filters updated", newFilters);
+    setFilters(newFilters);
+  };
+
+  // Build the filtered list
+  const filteredTasks = tasks.filter((task) => {
+    if (filters.status && task.status !== filters.status) return false;
+    if (filters.priority && task.priority !== filters.priority) return false;
+    return true;
+  });
